@@ -1,14 +1,4 @@
-/**
- * ============================================
- * TODO LIST WEB APPLICATION
- * ============================================
- * A dynamic Todo List application built with Node.js, Express, and EJS
- * Features: Add, Edit, Delete, and Filter tasks by priority
- * Author: Full-Stack Developer
- * ============================================
- */
 
-// Import required modules
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -17,11 +7,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ============================================
-// MIDDLEWARE CONFIGURATION
-// ============================================
 
-// Set EJS as the view engine for rendering dynamic HTML
 app.set('view engine', 'ejs');
 
 // Set the directory where EJS templates are stored
@@ -33,14 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Serve static files (CSS, JS, images) from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ============================================
-// IN-MEMORY DATABASE (ARRAY)
-// ============================================
 
-/**
- * Todos array - stores all tasks in memory
- * Structure: { id: Number, task: String, priority: String }
- */
 let todos = [
   { id: 1, task: 'Complete project documentation', priority: 'High' },
   { id: 2, task: 'Review code and fix bugs', priority: 'Medium' },
@@ -69,11 +48,7 @@ app.get('/', (req, res) => {
   });
 });
 
-/**
- * GET /filter?priority=value - Filter todos by priority
- * Query parameter: priority (High, Medium, Low, or All)
- * Filters and displays tasks based on selected priority
- */
+
 app.get('/filter', (req, res) => {
   const { priority } = req.query;  // Get priority from query string
   let filteredTodos = todos;
@@ -92,15 +67,8 @@ app.get('/filter', (req, res) => {
   });
 });
 
-// ============================================
-// ROUTES - POST REQUESTS (CRUD OPERATIONS)
-// ============================================
 
-/**
- * POST /add - Add a new todo
- * Body parameters: task (String), priority (String)
- * Validates input and adds new task to the array
- */
+ 
 app.post('/add', (req, res) => {
   const { task, priority } = req.body;
   
@@ -147,12 +115,7 @@ app.post('/add', (req, res) => {
   });
 });
 
-/**
- * POST /edit/:id - Edit an existing todo
- * URL parameter: id (Number)
- * Body parameters: task (String), priority (String)
- * Updates the task with the specified ID
- */
+
 app.post('/edit/:id', (req, res) => {
   const { id } = req.params;              // Get ID from URL
   const { task, priority } = req.body;    // Get updated data from form
@@ -209,11 +172,8 @@ app.post('/edit/:id', (req, res) => {
   }
 });
 
-/**
- * POST /delete/:id - Delete a todo
- * URL parameter: id (Number)
- * Removes the task with the specified ID from the array
- */
+
+
 app.post('/delete/:id', (req, res) => {
   const { id } = req.params;
   const initialLength = todos.length;
@@ -240,14 +200,7 @@ app.post('/delete/:id', (req, res) => {
   }
 });
 
-// ============================================
-// SERVER INITIALIZATION
-// ============================================
 
-/**
- * Start the Express server
- * Listen on the specified PORT
- */
 app.listen(PORT, () => {
   console.log(`📍 Server running at: http://localhost:${PORT}`);
 });
