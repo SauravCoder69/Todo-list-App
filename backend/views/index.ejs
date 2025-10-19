@@ -1,0 +1,225 @@
+<!-- 
+    ============================================
+    TODO LIST - MAIN PAGE
+    ============================================
+    This page displays all todos with options to:
+    - Add new tasks
+    - Edit existing tasks
+    - Delete tasks
+    - Filter by priority
+    ============================================
+-->
+
+<%- include('partials/header') %>
+
+<main class="main-content">
+    <div class="container">
+        
+        <!-- Alert Messages - Display success/error notifications -->
+        <% if (error) { %>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span><%= error %></span>
+                <button class="alert-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        <% } %>
+        
+        <% if (success) { %>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span><%= success %></span>
+                <button class="alert-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        <% } %>
+
+        <!-- Add Todo Form - Create new tasks -->
+        <div class="add-todo-section">
+            <h2><i class="fas fa-plus-circle"></i> Add New Task</h2>
+            <form action="/add" method="POST" class="add-todo-form" id="addTodoForm">
+                <div class="form-group">
+                    <!-- Task input field -->
+                    <input 
+                        type="text" 
+                        name="task" 
+                        id="todoInput"
+                        placeholder="Enter your task..." 
+                        class="todo-input"
+                        autocomplete="off"
+                    >
+                    <!-- Priority selector -->
+                    <select name="priority" class="priority-select">
+                        <option value="High">High Priority</option>
+                        <option value="Medium" selected>Medium Priority</option>
+                        <option value="Low">Low Priority</option>
+                    </select>
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filter Section - Filter tasks by priority using query parameters -->
+        <div class="filter-section">
+            <h3><i class="fas fa-filter"></i> Filter by Priority</h3>
+            <div class="filter-buttons">
+                <!-- Show all tasks -->
+                <a href="/filter?priority=All" class="btn-filter <%= filter === 'All' ? 'active' : '' %>">
+                    All Tasks
+                </a>
+                <!-- Filter by High priority -->
+                <a href="/filter?priority=High" class="btn-filter <%= filter === 'High' ? 'active' : '' %>">
+                    <span class="priority-badge high">High</span>
+                </a>
+                <!-- Filter by Medium priority -->
+                <a href="/filter?priority=Medium" class="btn-filter <%= filter === 'Medium' ? 'active' : '' %>">
+                    <span class="priority-badge medium">Medium</span>
+                </a>
+                <!-- Filter by Low priority -->
+                <a href="/filter?priority=Low" class="btn-filter <%= filter === 'Low' ? 'active' : '' %>">
+                    <span class="priority-badge low">Low</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Todo List - Display all tasks dynamically -->
+        <div class="todo-list-section">
+            <h2>
+                <i class="fas fa-list"></i> 
+                <%= filter === 'All' ? 'All Tasks' : filter + ' Priority Tasks' %>
+                <span class="task-count">(<%= todos.length %>)</span>
+            </h2>
+            
+            <!-- Empty state when no tasks exist -->
+            <% if (todos.length === 0) { %>
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>No tasks found. Add a new task to get started!</p>
+                </div>
+            <% } else { %>
+                <!-- Loop through todos and display each one -->
+                <div class="todo-list">
+                    <% todos.forEach(todo => { %>
+                        <div class="todo-item" data-id="<%= todo.id %>">
+                            <div class="todo-left">
+                                <!-- Task content -->
+                                <div class="todo-content">
+                                    <span class="todo-text"><%= todo.task %></span>
+                                    <!-- Priority badge with color coding -->
+                                    <span class="priority-badge <%= todo.priority.toLowerCase() %>">
+                                        <%= todo.priority %>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Action buttons: Edit and Delete -->
+                            <div class="todo-actions">
+                                <!-- Edit button triggers modal -->
+                                <button class="btn-action btn-edit" onclick="editTodo(<%= todo.id %>, `<%= todo.task %>`, '<%= todo.priority %>')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <!-- Delete form with confirmation -->
+                                <form action="/delete/<%= todo.id %>" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn-action btn-delete" onclick="return confirm('Are you sure you want to delete this task?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Task Statistics - Display task counts by priority -->
+        <% 
+            const totalTasks = todos.length;
+            const highPriorityTasks = todos.filter(t => t.priority === 'High').length;
+            const mediumPriorityTasks = todos.filter(t => t.priority === 'Medium').length;
+            const lowPriorityTasks = todos.filter(t => t.priority === 'Low').length;
+        %>
+        <div class="stats-section">
+            <!-- Total tasks count -->
+            <div class="stat-card">
+                <i class="fas fa-tasks"></i>
+                <div>
+                    <h4><%= totalTasks %></h4>
+                    <p>Total Tasks</p>
+                </div>
+            </div>
+            <!-- High priority count -->
+            <div class="stat-card stat-high">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>
+                    <h4><%= highPriorityTasks %></h4>
+                    <p>High Priority</p>
+                </div>
+            </div>
+            <!-- Medium priority count -->
+            <div class="stat-card stat-medium">
+                <i class="fas fa-minus-circle"></i>
+                <div>
+                    <h4><%= mediumPriorityTasks %></h4>
+                    <p>Medium Priority</p>
+                </div>
+            </div>
+            <!-- Low priority count -->
+            <div class="stat-card stat-low">
+                <i class="fas fa-arrow-circle-down"></i>
+                <div>
+                    <h4><%= lowPriorityTasks %></h4>
+                    <p>Low Priority</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- Edit Modal - Modal dialog for editing tasks -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-edit"></i> Edit Task</h3>
+            <button class="modal-close" onclick="closeEditModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <!-- Edit form - submits to /edit/:id -->
+        <form id="editForm" method="POST">
+            <div class="form-group">
+                <label for="editTask">Task Description</label>
+                <input 
+                    type="text" 
+                    name="task" 
+                    id="editTask"
+                    class="todo-input"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="editPriority">Priority</label>
+                <select name="priority" id="editPriority" class="priority-select">
+                    <option value="High">High Priority</option>
+                    <option value="Medium">Medium Priority</option>
+                    <option value="Low">Low Priority</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

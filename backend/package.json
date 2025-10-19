@@ -1,0 +1,29 @@
+{
+  "name": "todo-app-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Todo List Application built with Node.js, Express.js, and EJS",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "todo",
+    "task-manager",
+    "nodejs",
+    "express",
+    "ejs",
+    "backend",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ejs": "^3.1.9",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
